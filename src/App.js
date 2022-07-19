@@ -1,40 +1,33 @@
-import React from "react"
+import React, { Suspense } from "react"
 
 import "./App.css"
 import Page1 from "./components/Page1"
+// Part 1 No Code splitting
 //import Page2 from "./components/Page2"
 //import Page3 from "./components/Page3"
-import AsyncComponent from "./AsyncComponent"
 
-//function App() {
-//  return (
-//    <div className="App">
-//      <header className="App-header">
-//        <img src={logo} className="App-logo" alt="logo" />
-//        <p>
-//          Edit <code>src/App.js</code> and save to reload.
-//        </p>
-//        <a
-//          className="App-link"
-//          href="https://reactjs.org"
-//          target="_blank"
-//          rel="noopener noreferrer"
-//        >
-//          Learn React
-//        </a>
-//      </header>
-//    </div>
-//  );
-//}
+//Part 2 Clean code splitting
+//import AsyncComponent from "./AsyncComponent"
+
+//Part 3 React.lazy
+const Page2Lazy = React.lazy(() => import("./components/Page2"))
+const Page3Lazy = React.lazy(() => import("./components/Page3"))
 
 class App extends React.Component {
   constructor() {
     super()
-    this.state = { route: "page1" }
+    this.state = {
+      route: "page1",
+      // Part 2 Code splitting - manual
+      // component: null
+    }
   }
   onRouteChange = async (route) => {
-    // No code splitting
+    // Part 1 No Code splitting
+
     this.setState({ route })
+
+    //Part 2 Clean code splitting
     //if (route === "page1") {
     //  this.setState({ route })
     //} else if (route === "page2") {
@@ -49,7 +42,7 @@ class App extends React.Component {
     //}
   }
   render() {
-    // No code splitting
+    // Part 1 No Code splitting
     //if (this.state.route === "page1") {
     //  return <Page1 onRouteChange={this.onRouteChange} />
     //} else if (this.state.route === "page2") {
@@ -57,15 +50,31 @@ class App extends React.Component {
     //} else if (this.state.route === "page3") {
     //  return <Page3 onRouteChange={this.onRouteChange} />
     //}
-
+    // Part 2 Code splitting - manual , Part 3
+    //if (this.state.route === "page1") {
+    //  return <Page1 onRouteChange={this.onRouteChange} />
+    //} else if (this.state.route === "page2") {
+    //  const AsyncPage2 = AsyncComponent(() => import("./components/Page2"))
+    //  return <AsyncPage2 onRouteChange={this.onRouteChange} />
+    //} else if (this.state.route === "page3") {
+    //  const AsyncPage3 = AsyncComponent(() => import("./components/Page3"))
+    //  return <AsyncPage3 onRouteChange={this.onRouteChange} />
+    //}
+    // Part 4 - Ract .lazy
     if (this.state.route === "page1") {
       return <Page1 onRouteChange={this.onRouteChange} />
     } else if (this.state.route === "page2") {
-      const AsyncPage2 = AsyncComponent(() => import("./components/Page2"))
-      return <AsyncPage2 onRouteChange={this.onRouteChange} />
+      return (
+        <Suspense fallback={<div>Loading</div>}>
+          <Page2Lazy onRouteChange={this.onRouteChange} />
+        </Suspense>
+      )
     } else if (this.state.route === "page3") {
-      const AsyncPage3 = AsyncComponent(() => import("./components/Page3"))
-      return <AsyncPage3 onRouteChange={this.onRouteChange} />
+      return (
+        <Suspense fallback={<div>Loading</div>}>
+          <Page3Lazy onRouteChange={this.onRouteChange} />
+        </Suspense>
+      )
     }
   }
 }
